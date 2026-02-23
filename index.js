@@ -2,62 +2,57 @@ const express = require('express');
 const path = require('path');
 const session = require('express-session');
 const bcrypt = require('bcrypt');
+const http = require('http');
+const { Server } = require('socket.io');
 
 const app = express();
+const server = http.createServer(app);
+const io = new Server(server);
 
-// --- ESTAS DUAS LINHAS RESOLVEM O ERRO DO RENDER ---
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
-
-// --- CONFIGURAÇÕES DO SERVIDOR ---
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.use(session({
-    secret: 'lighthosting_secret_key',
+    secret: 'light_secret_key',
     resave: false,
     saveUninitialized: true
 }));
 
-const users = [];
+const users = []; // Banco temporário (será limpo no restart do Render)
 
-// ROTA: Página Inicial (Login)
-app.get('/', (req, res) => {
-    res.render('login'); // Vai procurar views/login.ejs
-});
+app.get('/', (req, res) => res.render('login'));
 
-// ROTA: Registro (O que você enviou)
 app.post('/register', async (req, res) => {
-    try {
-        const { username, password } = req.body;
-        const hashedPassword = await bcrypt.hash(password, 10);
-        users.push({ username, password: hashedPassword });
-        console.log(`Usuário ${username} cadastrado!`);
-        res.redirect('/');
-    } catch (e) {
-        res.status(500).send("Erro ao cadastrar.");
-    }
+    const hashedPassword = await bcrypt.hash(req.body.password, 10);
+    users.push({ username: req.body.username, password: hashedPassword });
+    res.send('Conta criada! <a href="/">Voltar e Logar</a>');
 });
 
-// Rota de Login simples
 app.post('/login', async (req, res) => {
-    const { username, password } = req.body;
-    const user = users.find(u => u.username === username);
-    if (user && await bcrypt.compare(password, user.password)) {
+    const user = users.find(u => u.username === req.body.username);
+    if (user && await bcrypt.compare(req.body.password, user.password)) {
         req.session.loggedIn = true;
+        req.session.user = req.body.username;
         return res.redirect('/dashboard');
     }
-    res.send("Erro no login.");
+    res.send("Login incorreto.");
 });
 
-// Rota do Painel
 app.get('/dashboard', (req, res) => {
     if (!req.session.loggedIn) return res.redirect('/');
-    res.send("<h1>Bem-vindo ao Painel LightHosting!</h1><p>Seu i5 de 11ª está conectado.</p>");
+    res.render('dashboard', { user: req.session.user });
+});
+
+// CONEXÃO COM O i5
+io.on('connection', (socket) => {
+    console.log('✅ Máquina i5 conectada ao painel!');
+    socket.on('comando-painel', (cmd) => {
+        io.emit('executar-no-pc', cmd); // Repassa o comando para o maquina.js
+    });
 });
 
 const PORT = process.env.PORT || 10000;
-app.listen(PORT, () => {
-    console.log(`Servidor rodando na porta ${PORT}`);
-});
+server.listen(PORT, () => console.log(`Site rodando na porta ${PORT}`));

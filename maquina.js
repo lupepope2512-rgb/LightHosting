@@ -1,19 +1,18 @@
 const io = require('socket.io-client');
 const { exec } = require('child_process');
+// USE O SEU LINK DO RENDER ABAIXO
+const socket = io('https://lighthosting.onrender.com'); 
 
-// Quando você subir para o Render, troque esse localhost pela URL do Render
-const socket = io('http://localhost:3000'); 
+socket.on('connect', () => {
+    console.log("✅ i5 de 11ª Conectado ao Render!");
+});
 
-console.log("🖥️  i5 de 11ª Geração pronto para a ação!");
-
-socket.on('comando-pc', (data) => {
-    if (data.acao === 'start') {
-        console.log(`🚀 Ligando servidor de ${data.ram}GB RAM...`);
-        // O comando para abrir o seu Minecraft
-        exec(`java -Xmx${data.ram}G -jar server.jar nogui`, { cwd: './pasta_do_server' });
-    }
-    if (data.acao === 'stop') {
-        console.log("🛑 Desligando todos os servidores Java...");
-        exec('taskkill /f /im java.exe');
+socket.on('executar-no-pc', (cmd) => {
+    if (cmd === 'start') {
+        console.log("🚀 ABRINDO SERVIDOR DE MINECRAFT NO SEU PC...");
+        // Substitua 'server.bat' pelo nome do seu arquivo de ligar o server
+        exec('start server.bat', (err) => {
+            if (err) console.error("Erro ao abrir arquivo:", err);
+        });
     }
 });

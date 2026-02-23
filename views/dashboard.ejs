@@ -1,0 +1,21 @@
+<body style="background: #121212; color: white; font-family: sans-serif; padding: 40px; text-align: center;">
+    <h1 style="color: #00a2ff;">🚀 LIGHTHOSTING - PAINEL REAL</h1>
+    <p>Bem-vindo, <strong><%= user %></strong>!</p>
+
+    <div style="background: #1e1e1e; padding: 20px; border-radius: 10px; border: 1px solid #00a2ff; display: inline-block;">
+        <h3>Controle do i5 11ª Gen (24GB RAM)</h3>
+        <button id="btnStart" style="background: #28a745; color: white; padding: 15px 30px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">
+            LIGAR SERVIDOR DE MINECRAFT
+        </button>
+        <p id="status" style="margin-top: 15px; color: #00ff00;">> Sistema pronto.</p>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        document.getElementById('btnStart').onclick = () => {
+            socket.emit('comando-painel', 'start');
+            document.getElementById('status').innerText = "> Comando enviado para o i5 local...";
+        };
+    </script>
+</body>

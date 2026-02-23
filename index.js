@@ -5,11 +5,11 @@ const bcrypt = require('bcrypt');
 
 const app = express();
 
-// --- CONFIGURAÇÃO PARA RESOLVER O ERRO DO RENDER ---
-app.set('view engine', 'ejs'); // Define o motor de visualização
-app.set('views', path.join(__dirname, 'views')); // Define a pasta das páginas
+// --- CONFIGURAÇÃO DO MOTOR DE PÁGINAS (ESSENCIAL PARA O RENDER) ---
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
 
-// --- MIDDLEWARES ESSENCIAIS ---
+// --- MIDDLEWARES ---
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -20,17 +20,17 @@ app.use(session({
     saveUninitialized: true
 }));
 
-// Banco de dados temporário (em memória)
+// Banco de dados em memória (reseta se o Render reiniciar)
 const users = [];
 
 // --- ROTAS ---
 
 // Página Inicial (Login/Cadastro)
 app.get('/', (req, res) => {
-    res.render('login'); // Vai procurar views/login.ejs
+    res.render('login'); // Renderiza o arquivo views/login.ejs
 });
 
-// Rota de Registro (O seu formulário envia para cá)
+// Processar Registro (Resolve o erro "Cannot POST /register")
 app.post('/register', async (req, res) => {
     try {
         const { username, password } = req.body;
@@ -39,14 +39,14 @@ app.post('/register', async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 10);
         users.push({ username, password: hashedPassword });
         
-        console.log(`Usuário registrado: ${username}`);
-        res.send('Conta criada com sucesso! <a href="/">Voltar para Login</a>');
+        console.log(`[LOG] Usuário cadastrado: ${username}`);
+        res.send('Conta criada! <a href="/">Clique aqui para logar</a>');
     } catch (e) {
-        res.status(500).send("Erro interno ao cadastrar.");
+        res.status(500).send("Erro no servidor ao registrar.");
     }
 });
 
-// Rota de Login
+// Processar Login
 app.post('/login', async (req, res) => {
     const { username, password } = req.body;
     const user = users.find(u => u.username === username);
@@ -56,15 +56,16 @@ app.post('/login', async (req, res) => {
         req.session.user = username;
         return res.redirect('/dashboard');
     }
-    res.send("Usuário ou senha incorretos.");
+    res.send("Login incorreto. <a href='/'>Tentar novamente</a>");
 });
 
-// Dashboard (Onde o i5 de 11ª vai brilhar)
+// Dashboard do Cliente
 app.get('/dashboard', (req, res) => {
     if (!req.session.loggedIn) return res.redirect('/');
-    res.send(`<h1>Bem-vindo, ${req.session.user}!</h1><p>Seu i5 de 11ª Geração está pronto para a ação.</p>`);
+    res.send(`<h1>Painel LightHosting</h1><p>Olá ${req.session.user}, seu i5 de 11ª está Online!</p>`);
 });
 
+// Define a porta para o Render (10000) ou local (3000)
 const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => {
     console.log(`Servidor rodando na porta ${PORT}`);

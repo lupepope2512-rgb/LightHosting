@@ -1,82 +1,71 @@
 const express = require('express');
-const bcrypt = require('bcrypt');
-const session = require('express-session');
 const path = require('path');
+const session = require('express-session');
+const bcrypt = require('bcrypt');
 
 const app = express();
 
-// Configurações para ler os dados do formulário
+// --- CONFIGURAÇÃO PARA RESOLVER O ERRO DO RENDER ---
+app.set('view engine', 'ejs'); // Define o motor de visualização
+app.set('views', path.join(__dirname, 'views')); // Define a pasta das páginas
+
+// --- MIDDLEWARES ESSENCIAIS ---
+app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// Configuração de Sessão (para manter o usuário logado)
 app.use(session({
     secret: 'lighthosting_secret_key',
     resave: false,
     saveUninitialized: true
 }));
 
-// Banco de dados em memória (apenas para teste, reseta se o Render reiniciar)
-// Para produção, o ideal é usar MongoDB ou SQLite
+// Banco de dados temporário (em memória)
 const users = [];
 
-// ROTA: Página de Login/Registro (A que você já tem)
+// --- ROTAS ---
+
+// Página Inicial (Login/Cadastro)
 app.get('/', (req, res) => {
-    res.render('login'); // Certifique-se que o arquivo login.ejs existe na pasta /views
+    res.render('login'); // Vai procurar views/login.ejs
 });
 
-// ROTA: Processar o Registro (Onde estava dando erro)
+// Rota de Registro (O seu formulário envia para cá)
 app.post('/register', async (req, res) => {
     try {
         const { username, password } = req.body;
+        if (!username || !password) return res.send("Preencha todos os campos!");
 
-        // Verifica se o usuário já existe
-        const userExists = users.find(u => u.username === username);
-        if (userExists) {
-            return res.send('Usuário já cadastrado! <a href="/">Voltar</a>');
-        }
-
-        // Criptografa a senha antes de salvar
         const hashedPassword = await bcrypt.hash(password, 10);
-
-        // Salva o usuário no nosso "banco"
-        users.push({
-            username: username,
-            password: hashedPassword
-        });
-
-        console.log(`Novo usuário registrado: ${username}`);
+        users.push({ username, password: hashedPassword });
         
-        // Redireciona para o login após cadastrar
-        res.redirect('/');
-    } catch (error) {
-        res.status(500).send("Erro ao registrar usuário.");
+        console.log(`Usuário registrado: ${username}`);
+        res.send('Conta criada com sucesso! <a href="/">Voltar para Login</a>');
+    } catch (e) {
+        res.status(500).send("Erro interno ao cadastrar.");
     }
 });
 
-// ROTA: Processar o Login
+// Rota de Login
 app.post('/login', async (req, res) => {
     const { username, password } = req.body;
     const user = users.find(u => u.username === username);
 
     if (user && await bcrypt.compare(password, user.password)) {
         req.session.loggedIn = true;
-        req.session.username = username;
+        req.session.user = username;
         return res.redirect('/dashboard');
     }
-
-    res.send('Usuário ou senha incorretos! <a href="/">Tentar novamente</a>');
+    res.send("Usuário ou senha incorretos.");
 });
 
-// ROTA: Painel de Controle (Dashboard)
+// Dashboard (Onde o i5 de 11ª vai brilhar)
 app.get('/dashboard', (req, res) => {
-    if (!req.session.loggedIn) {
-        return res.redirect('/');
-    }
-    res.send(`<h1>Bem-vindo ao Painel LightHosting, ${req.session.username}!</h1> <p>Seu i5 de 11ª está pronto.</p>`);
+    if (!req.session.loggedIn) return res.redirect('/');
+    res.send(`<h1>Bem-vindo, ${req.session.user}!</h1><p>Seu i5 de 11ª Geração está pronto para a ação.</p>`);
 });
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => {
     console.log(`Servidor rodando na porta ${PORT}`);
 });

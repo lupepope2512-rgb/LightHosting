@@ -2,44 +2,32 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>LightHost | Acesso</title>
+    <title>LightHosting - Login</title>
     <style>
-        body { background: #0a0a0c; color: white; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; }
-        .container { background: #111114; padding: 40px; border-radius: 15px; border: 1px solid #232326; width: 300px; text-align: center; }
-        h1 { color: #3b82f6; margin-bottom: 5px; }
-        p { color: #62626e; font-size: 14px; margin-bottom: 20px; }
-        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #232326; background: #1c1c21; color: white; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 10px; transition: 0.3s; }
-        .btn-login { background: #3b82f6; color: white; }
-        .btn-register { background: transparent; color: #7c3aed; border: 1px solid #7c3aed; font-size: 12px; }
-        .btn-login:hover { background: #2563eb; }
-        .error { color: #ef4444; font-size: 13px; margin-bottom: 10px; }
+        body { background: #121212; color: white; font-family: sans-serif; text-align: center; padding-top: 50px; }
+        .box { background: #1e1e1e; padding: 20px; border-radius: 10px; display: inline-block; }
+        input { display: block; margin: 10px auto; padding: 10px; border-radius: 5px; border: none; }
+        button { background: #00a2ff; color: white; padding: 10px 20px; border: none; cursor: pointer; border-radius: 5px; }
     </style>
 </head>
 <body>
-
-    <div class="container">
-        <h1>LIGHT<span>HOST</span></h1>
-        <p>Acesse seu painel de controle</p>
-
-        <% if (error) { %>
-            <div class="error"><%= error %></div>
-        <% } %>
-
+    <div class="box">
+        <h2>LIGHTHOST</h2>
+        <p>Acesse seu painel</p>
+        
         <form action="/login" method="POST">
             <input type="text" name="username" placeholder="Usuário" required>
             <input type="password" name="password" placeholder="Senha" required>
-            <button type="submit" class="btn-login">ENTRAR</button>
+            <button type="submit">ENTRAR</button>
         </form>
 
-        <hr style="border: 0; border-top: 1px solid #232326; margin: 20px 0;">
+        <hr>
 
         <form action="/register" method="POST">
             <input type="text" name="username" placeholder="Novo Usuário" required>
             <input type="password" name="password" placeholder="Nova Senha" required>
-            <button type="submit" class="btn-register">CRIAR CONTA AUTOMÁTICA</button>
+            <button type="submit" style="background: #6200ea;">CRIAR CONTA</button>
         </form>
     </div>
-
 </body>
 </html>

@@ -1,0 +1,14 @@
+{
+    "users": {
+        "undefined": {
+            "saldo": 2
+        },
+        "Luper_": {
+            "username": "Luper_",
+            "password": "2804",
+            "saldo": 4,
+            "status": "Online",
+            "plano": "Nenhum"
+        }
+    }
+}

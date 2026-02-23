@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Loja | LightHost</title>
+    <style>
+        body { background: #0a0a0c; color: white; font-family: sans-serif; padding: 50px; text-align: center; }
+        .grid { display: flex; justify-content: center; gap: 20px; margin-top: 40px; }
+        .card { background: #111114; padding: 30px; border-radius: 15px; border: 1px solid #232326; width: 250px; }
+        .price { font-size: 24px; color: #3b82f6; font-weight: bold; margin: 15px 0; }
+        .buy-btn { width: 100%; padding: 10px; border: none; border-radius: 5px; background: #7c3aed; color: white; cursor: pointer; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>Escolha o seu Plano</h1>
+    <p>Seu saldo atual: <span style="color: #3b82f6;">R$ <%= user.saldo.toFixed(2) %></span></p>
+
+    <div class="grid">
+        <div class="card">
+            <h2>FERRO</h2>
+            <p>2GB RAM</p>
+            <div class="price">R$ 5,00</div>
+            <form action="/comprar/Ferro" method="POST"><button class="buy-btn">CONTRATAR</button></form>
+        </div>
+        <div class="card" style="border-color: #fbbf24;">
+            <h2 style="color: #fbbf24;">OURO</h2>
+            <p>4GB RAM</p>
+            <div class="price">R$ 15,00</div>
+            <form action="/comprar/Ouro" method="POST"><button class="buy-btn" style="background: #fbbf24;">CONTRATAR</button></form>
+        </div>
+        <div class="card" style="border-color: #7c3aed;">
+            <h2 style="color: #7c3aed;">NETHERITE</h2>
+            <p>8GB RAM</p>
+            <div class="price">R$ 30,00</div>
+            <form action="/comprar/Netherite" method="POST"><button class="buy-btn">CONTRATAR</button></form>
+        </div>
+    </div>
+
+    <br><br>
+    <a href="/painel" style="color: #62626e; text-decoration: none;">← Voltar ao Painel</a>
+</body>
+</html>

@@ -1,0 +1,36 @@
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<div class="grid grid-cols-2 gap-4 mb-6">
+    <div class="card-premium p-4 flex flex-col items-center">
+        <span class="text-[10px] font-bold text-slate-400 uppercase">Uso de CPU</span>
+        <canvas id="cpuChart" height="80"></canvas>
+    </div>
+    <div class="card-premium p-4 flex flex-col items-center">
+        <span class="text-[10px] font-bold text-slate-400 uppercase">Uso de RAM</span>
+        <canvas id="ramChart" height="80"></canvas>
+    </div>
+</div>
+
+<script>
+    const ctxCpu = document.getElementById('cpuChart').getContext('2d');
+    const ctxRam = document.getElementById('ramChart').getContext('2d');
+    
+    const chartConfig = (label, color) => ({
+        type: 'line',
+        data: { labels: ['', '', '', '', '', '', '', '', '', ''], datasets: [{ label, data: [], borderColor: color, tension: 0.4, fill: true, backgroundColor: color + '10' }]},
+        options: { plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { display: false } }, elements: { point: { radius: 0 } } }
+    });
+
+    const cpuChart = new Chart(ctxCpu, chartConfig('CPU', '#3b82f6'));
+    const ramChart = new Chart(ctxRam, chartConfig('RAM', '#10b981'));
+
+    socket.on('stats', (data) => {
+        cpuChart.data.datasets[0].data.push(data.cpu);
+        if(cpuChart.data.datasets[0].data.length > 10) cpuChart.data.datasets[0].data.shift();
+        cpuChart.update();
+
+        ramChart.data.datasets[0].data.push(data.ram);
+        if(ramChart.data.datasets[0].data.length > 10) ramChart.data.datasets[0].data.shift();
+        ramChart.update();
+    });
+</script>

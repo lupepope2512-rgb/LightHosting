@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>LightHost | Painel</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { margin: 0; background: #0a0a0c; color: white; font-family: sans-serif; display: flex; height: 100vh; }
+        .sidebar { width: 80px; background: #111114; display: flex; flex-direction: column; align-items: center; padding-top: 20px; border-right: 1px solid #232326; }
+        .sidebar a { color: #4b5563; font-size: 24px; margin-bottom: 30px; text-decoration: none; }
+        .main { flex: 1; padding: 40px; }
+        .btn { border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; color: white; font-weight: bold; margin-right: 10px; }
+        .status { padding: 5px 10px; border-radius: 4px; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <a href="/painel" style="color:#7c3aed;"><i class="fa-solid fa-terminal"></i></a>
+        <a href="/loja"><i class="fa-solid fa-shop"></i></a>
+        <a href="https://discord.gg/ay6RxDeb" target="_blank"><i class="fa-solid fa-headset"></i></a>
+    </div>
+    <div class="main">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h1>Servidor: <%= user.username %>_</h1>
+            <div style="text-align: right;">
+                <div style="color: #3b82f6; font-weight: bold;">Saldo: R$ <%= user.saldo.toFixed(2) %></div>
+                <span class="status" style="background: <%= user.status === 'Online' ? '#10b981' : '#ef4444' %>"><%= user.status %></span>
+            </div>
+        </div>
+
+        <div style="margin-top: 30px; display: flex;">
+            <form action="/comando/start" method="POST"><button class="btn" style="background:#10b981;">LIGAR</button></form>
+            <form action="/comando/restart" method="POST"><button class="btn" style="background:#f59e0b;">REINICIAR</button></form>
+            <form action="/comando/stop" method="POST"><button class="btn" style="background:#ef4444;">DESLIGAR</button></form>
+        </div>
+
+        <div style="background: black; padding: 20px; border-radius: 10px; margin-top: 20px; border: 1px solid #232326; color: #10b981; height: 200px; font-family: monospace;">
+            <div>[System] Bem-vindo, <%= user.username %>!</div>
+            <div>[System] Status: <%= user.status %></div>
+            <% if(user.planoAtual) { %> <div>[Plano] Ativo: <%= user.planoAtual %></div> <% } %>
+        </div>
+    </div>
+</body>
+</html>
